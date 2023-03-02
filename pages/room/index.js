@@ -52,10 +52,6 @@ function Test() {
     const [itemsPerPage, setItemsPerPage] = useState(6);
     const [sideMenu, setSideMenu] = useState("chat")
 
-    const [roomId, setRoomId] = useState({
-        audio: "63de708fda7e7ca812840b9f",
-        av: "63d0fc1fda7e7ca812840a99"
-    })
     const [type, setType] = useState("")
     const [role, setRole] = useState("")
 
@@ -65,6 +61,7 @@ function Test() {
         userName: "",
         roomName: ""
     })
+    const [room, setRoom] = useState({})
 
     useEffect(() => {
         // console.log(router.query)
@@ -85,7 +82,7 @@ function Test() {
         // }
         // createRoom()
 
-        if (!router.query?.roomId) {
+        if (!router.query?.roomId || !localPeer) {
             setModal(true)
         } else {
             // let token;
@@ -258,7 +255,7 @@ function Test() {
         isVisible(dat)
     }
 
-    // console.log(peers)
+    console.log(peers)
     // console.log(stage)
 
     const createRoom = async () => {
@@ -304,7 +301,7 @@ function Test() {
         var app_secret = '3HWPQKsBSNyZ9ICTlYCqbaOV_-xgSNhRI7B1jHW5kdronpBi4J--L-18oSAlfU-IrljWHs0WHWMXLTb1hdIHTreCA_gtT7fEwKcvmqQ9pLmGCcV6O3tQoBuZ_UegBjTK_FhercYND1z4NkWa358p9kzCjMmxMTPJaS7Df4WMsO0=';
         var jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwidHlwZSI6Im1hbmFnZW1lbnQiLCJ2ZXJzaW9uIjoyLCJpYXQiOjE2Nzc3OTAyMTcsIm5iZiI6MTY3Nzc5MDIxNywiZXhwIjoxNjg1NTY2MjE3LCJqdGkiOiJjYmY0ODg2OS04NWY0LTRlNmQtYTkxNC0zOTRjMjJkNDQ0YWMifQ.EdcCJxKsTLogDptnAqpjB3wPvdHB3hriWqpJH3890FA'
         const config = {
-            headers: { 'Authorization': `Bearer ${jwt}`, 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'accept' : '*/*' },
+            headers: { 'Authorization': `Bearer ${jwt}`, 'Content-Type': 'application/json' },
         };
 
         await axios.post("https://api.100ms.live/v2/rooms", {
@@ -315,7 +312,31 @@ function Test() {
             }
         }, config)
             .then((res) => {
-                console.log("new room resp is ", res)
+                console.log("new room resp is ", res.data)
+                setRoom(res?.data)
+
+                let token;
+                axios.post(`https://prod-in2.100ms.live/hmsapi/dvconf.app.100ms.live/api/token`, {
+                    user_id: res?.data?.customer,
+                    role: "host",
+                    room_id: res?.data?.id,
+
+                })
+                    .then((res) => {
+                        console.log(res);
+                        // const { token } = {...res};
+                        // console.log(token)
+                        token = res?.data?.token
+                        hmsActions.join({
+                            userName: user?.userName,
+                            // authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwicm9vbV9pZCI6IjYzZDBmYzFmZGE3ZTdjYTgxMjg0MGE5OSIsInVzZXJfaWQiOiIxMjM0Iiwicm9sZSI6Imhvc3QiLCJqdGkiOiJkNDk3YjdhNS04NTFlLTQwZjktYjRmOC0zNzA4MTJmYzUwMWIiLCJ0eXBlIjoiYXBwIiwidmVyc2lvbiI6MiwiZXhwIjoxNjc0NzM1MzA0fQ.EWSPwSaJzMXYXe826u_0ODKD_8e2aHsEj7kEQHMC_8s",
+                            authToken: token,
+                            settings: {
+                                isAudioMuted: true,
+                            },
+                        });
+                        setModal(false)
+                    })
             })
             .catch((err) => {
                 console.log(err)
@@ -362,22 +383,10 @@ function Test() {
                                                         return (
                                                             <>
                                                                 <div className="relative">
-                                                                    {type === "av" && <VideoSpaces isLocal={false} peer={peer} setPinned={setPinned} pinned={pinned} />}
-                                                                    {type === "audio" && <AudioCard className="" peer={peer} />}
+                                                                   <VideoSpaces isLocal={false} peer={peer} setPinned={setPinned} pinned={pinned} />
                                                                 </div>
 
                                                             </>
-                                                            // {
-                                                            //     type === "av" ? (
-                                                            //         <div className="relative">
-                                                            //         <VideoSpaces isLocal={false} peer={peer} setPinned={setPinned} pinned={pinned} />
-                                                            //     </div>
-                                                            //     ) : (
-                                                            //         <div className="relative">
-                                                            //             <AudioCard peer={peer}/>
-                                                            //         </div>
-                                                            //     )
-                                                            // }
                                                         );
                                                     })}
                                         </div>
