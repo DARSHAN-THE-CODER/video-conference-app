@@ -301,7 +301,7 @@ function Test() {
         console.log(jwt)
 
         const config = {
-            headers: { Authorization: `Bearer ${jwt}`,'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+            headers: { 'Authorization': `Bearer ${app_access_key}`,'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         };
 
         await axios.post("https://dvconf.app.100ms.live/v2/rooms", {
