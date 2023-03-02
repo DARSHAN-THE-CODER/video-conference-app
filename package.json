@@ -13,6 +13,23 @@
     "eslint-config-next": "13.2.3",
     "next": "13.2.3",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "@coreui/coreui": "^4.1.5",
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/material": "^5.8.2",
+    "@reduxjs/toolkit": "^1.8.0",
+    "@tailwindcss/line-clamp": "^0.4.0",
+    "@100mslive/hms-video-store": "^0.8.1",
+    "@100mslive/react-sdk": "^0.6.1",
+    "axios": "^0.26.1",
+    "react-icons": "^4.3.1",
+    "tailwind-scrollbar-hide": "^1.1.7",
+    "tailwind-scrollbar": "^2.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7"
   }
 }
