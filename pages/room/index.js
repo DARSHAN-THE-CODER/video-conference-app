@@ -64,6 +64,7 @@ function Test() {
     const [room, setRoom] = useState({})
     const [invited, setInvited] = useState({ status: false, roomId: "" })
 
+
     useEffect(() => {
         if (!localPeer) {
             setModal(true)
@@ -258,7 +259,7 @@ function Test() {
                 .then((res) => {
                     console.log("new room resp is ", res.data)
                     setRoom(res?.data)
-
+                    console.log("room data is ",res?.data)
                     let token;
                     axios.post(`https://prod-in2.100ms.live/hmsapi/dvconf.app.100ms.live/api/token`, {
                         user_id: res?.data?.customer,
@@ -298,7 +299,7 @@ function Test() {
                         allMessages={allMessages}
                     />
                 </SidebarWrapper>
-                <div className={`relative h-[90vh] ${visible ? "md:col-span-7" : "md:col-span-full"}`}>
+                <div className={`relative h-[100vh] ${visible ? "md:col-span-7" : "md:col-span-full"}`}>
                     <div className="h-full overflow-auto bg-slate-600">
                         {screenShared ? (
                             <div className="flex flex-wrap gap-x-10 p-5  justify-center  mx-auto overflow-auto w-[70vw] my-auto rounded-2xl">
@@ -377,7 +378,7 @@ function Test() {
                         </div>)}
 
                         <div className="bg-slate-900 w-full md:rounded-full min-h-2/5 p-2">
-                            <Controls type={type} switches={setVisibility} visible={visible} setVisible={isVisible} isAudio={isAudio} />
+                            <Controls room={room} type={type} switches={setVisibility} visible={visible} setVisible={isVisible} isAudio={isAudio} />
                         </div>
                     </div>
                 </div>

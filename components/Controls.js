@@ -8,9 +8,13 @@ import {
   selectIsLocalVideoEnabled,
   selectPermissions,
   selectIsLocalScreenShared,
-  selectPeerMetadata
+  selectPeerMetadata,
+  selectRoomID
 } from "@100mslive/react-sdk";
 
+import {AiOutlineShareAlt} from "react-icons/ai";
+import { toast } from "react-toastify";
+import { copyTextToClipboard } from "@/utils/copyClipboard";
 import { BiVideoOff, BiVideo } from "react-icons/bi"
 import { AiOutlineAudio, AiOutlineAudioMuted } from "react-icons/ai"
 import { IoExitOutline } from "react-icons/io5"
@@ -22,8 +26,9 @@ import { BiMessageRoundedDots, BiMessageRoundedX } from "react-icons/bi"
 import { HiHand, HiOutlineHand } from "react-icons/hi"
 import { BsFillRecord2Fill } from "react-icons/bs"
 import axios from "axios";
+import { domainConf } from "@/utils/domainConf";
 
-function Controls({ switches, visible, setVisible, isAudio }) {
+function Controls({ switches, visible, setVisible, isAudio, room }) {
   const hmsActions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
   const stage = localPeer?.roleName === "stage";
@@ -32,10 +37,14 @@ function Controls({ switches, visible, setVisible, isAudio }) {
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
 
+  const roomState = useHMSStore(selectRoomID);
+
+  console.log("room id ",roomState)
   const [handRaised, setHandRaised] = useState(false)
 
   const [toggler, setToggler] = useState(false);
 
+  console.log("local peer is ", localPeer)
   // console.log(localPeer)
   // const localPeerId = useHMSStore(localPeer?.id);
   const metaData = useHMSStore(selectPeerMetadata(localPeer?.id));
@@ -58,6 +67,13 @@ function Controls({ switches, visible, setVisible, isAudio }) {
   const SwitchVideo = async () => {
     //toggle video enabled
     await hmsActions.setLocalVideoEnabled(!isLocalVideoEnabled);
+  };
+
+  const handleCopy = (e) => {
+    e.preventDefault();
+    console.log(room)
+    copyTextToClipboard(`${domainConf?.production}/room?roomId=${roomState}`);
+    toast("Copied post Link!", { type: "success" });
   };
 
   const ExitRoom = () => {
@@ -133,7 +149,12 @@ function Controls({ switches, visible, setVisible, isAudio }) {
         >
           {visible ? <BiMessageRoundedX /> : <BiMessageRoundedDots />}
         </button>
-
+        <button
+          onClick={handleCopy}
+          className="btn btn-blue flex items-center p-3"
+        >
+          <AiOutlineShareAlt />
+        </button>
         {stage ? (
           <>
             {/* <button
