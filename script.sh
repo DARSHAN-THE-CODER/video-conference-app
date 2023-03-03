@@ -5,7 +5,7 @@ yarn install
 echo "pushing to github"
 
 git add .
-git commit -m "features add"
+git commit -m "almost done"
 git push origin main
 
 echo "vercel deployment"

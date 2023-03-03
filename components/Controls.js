@@ -151,7 +151,7 @@ function Controls({ switches, visible, setVisible, isAudio, room }) {
         </button>
         <button
           onClick={handleCopy}
-          className="btn btn-blue flex items-center p-3"
+          className="bg-slate-400 rounded-lg flex items-center p-3"
         >
           <AiOutlineShareAlt />
         </button>

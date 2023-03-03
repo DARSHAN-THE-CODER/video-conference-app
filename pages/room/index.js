@@ -50,6 +50,7 @@ function Test() {
     const [currentPage, setCurrentPage] = useState(0);
     // const [videoCards, setVideoCards] = useState(props.videoCards);
 
+    const [show, setShow] = useState(true)
     const [itemsPerPage, setItemsPerPage] = useState(6);
     const [sideMenu, setSideMenu] = useState("chat")
 
@@ -67,9 +68,13 @@ function Test() {
 
     useEffect(() => {
         if (!localPeer) {
+            if(router?.query?.roomId) {
+                setInvited((prev) => ({status: true, roomId:router?.query?.roomId }))
+                setShow(false)
+            }
             setModal(true)
         }
-    }, [localPeer]);
+    }, [localPeer, router.query]);
 
     useEffect(() => {
         if (visible === true) {
@@ -289,6 +294,7 @@ function Test() {
                 })
         }
     }
+    console.log(show)
     return (
         <div className="max-h-screen justify-center ">
             <main className={`grid md:grid-cols-9 w-full h-full ${modal && "blur-sm"}`}>
@@ -377,7 +383,7 @@ function Test() {
                             </button>
                         </div>)}
 
-                        <div className="bg-slate-900 w-full md:rounded-full min-h-2/5 p-2">
+                        <div className="bg-slate-900 w-full md:rounded-2xl min-h-2/5 p-2">
                             <Controls room={room} type={type} switches={setVisibility} visible={visible} setVisible={isVisible} isAudio={isAudio} />
                         </div>
                     </div>
@@ -408,12 +414,13 @@ function Test() {
                                 onChange={(e) => setUser((prev) => ({ ...prev, userName: e.target.value }))}
                             />
                         </div>
-                        <div className="flex justify-center">
+                        
+                        {show && (<div className="flex justify-center">
                             <input type="checkbox" id="cb" className="my-auto cursor-pointer" defaultChecked={invited?.status} onChange={() => setInvited((prev) => ({ ...prev, status: !invited?.status }))} />
                             <label for="default-input" htmlFor="cb" className="block mb-2 text-sm font-medium text-gray-900 mt-2 ml-4">I have room ID</label>
-                        </div>
+                        </div>)}
                         {
-                            invited?.status ? (
+                            show && (invited?.status ? (
                                 <div className="mb-6">
                                     <label for="default-input" className="block mb-2 text-sm font-medium text-gray-900 ">Room Id</label>
                                     <input type="text" id="default-input" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -429,7 +436,7 @@ function Test() {
                                         onChange={(e) => setUser((prev) => ({ ...prev, roomName: e.target.value }))}
                                     />
                                 </div>
-                            )
+                            ))
                         }
 
                         <button onClick={() => createRoom()} type="submit" class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{invited?.status ? "Join room" : "Create room"}</button>
