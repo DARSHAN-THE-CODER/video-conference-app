@@ -73,7 +73,7 @@ function Controls({ switches, visible, setVisible, isAudio, room }) {
     e.preventDefault();
     console.log(room)
     copyTextToClipboard(`${domainConf?.production}/room?roomId=${roomState}`);
-    toast("Copied post Link!", { type: "success" });
+    toast("Copied meeting Link!", { type: "success" });
   };
 
   const ExitRoom = () => {
