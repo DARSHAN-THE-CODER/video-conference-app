@@ -259,7 +259,7 @@ function Test() {
             await axios.post("https://api.100ms.live/v2/rooms", {
                 name: user.roomName,
                 description: "This is a sample description for the room",
-                template_id: "64003f34862ddd899e776cf7"
+                // template_id: "64003f34862ddd899e776cf7"
             }, config)
                 .then((res) => {
                     console.log("new room resp is ", res.data)
