@@ -22,6 +22,8 @@ import axios from "axios";
 import { BsThreeDots } from "react-icons/bs"
 import { MdPushPin } from "react-icons/md"
 import { HiUserRemove, HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from "react-icons/hi"
+import { toast } from "react-toastify";
+import { copyTextToClipboard } from "@/utils/copyClipboard";
 
 import NameCard from "@/components/NameCard";
 import AudioCard from "@/components/AudioCard";
@@ -29,12 +31,11 @@ import AudioCard from "@/components/AudioCard";
 //[POST] https://api.100ms.live/v2/rooms
 import SidebarWrapper from "@/components/SidebarWrapper";
 import Modal from "@/components/Modal";
+import uuid4 from "uuid4";
 
-// import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
-import * as jose from 'jose'
 
 function Test() {
+    const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwidHlwZSI6Im1hbmFnZW1lbnQiLCJ2ZXJzaW9uIjoyLCJpYXQiOjE2Nzc3OTAyMTcsIm5iZiI6MTY3Nzc5MDIxNywiZXhwIjoxNjg1NTY2MjE3LCJqdGkiOiJjYmY0ODg2OS04NWY0LTRlNmQtYTkxNC0zOTRjMjJkNDQ0YWMifQ.EdcCJxKsTLogDptnAqpjB3wPvdHB3hriWqpJH3890FA'
     const localPeer = useHMSStore(selectLocalPeer);
     const stage = localPeer?.roleName === "stage";
     const viewer = localPeer?.roleName === "viewer";
@@ -53,7 +54,6 @@ function Test() {
     const [sideMenu, setSideMenu] = useState("chat")
 
     const [type, setType] = useState("")
-    const [role, setRole] = useState("")
 
     const router = useRouter();
     const [modal, setModal] = useState(false)
@@ -62,63 +62,13 @@ function Test() {
         roomName: ""
     })
     const [room, setRoom] = useState({})
+    const [invited, setInvited] = useState({ status: false, roomId: "" })
 
     useEffect(() => {
-        // console.log(router.query)
-        // const createRoom = async () => {
-        // axios.post("https://api.100ms.live/v2/rooms", {
-        //     name: "This is test room",
-        //     description: "This is a sample description for the room",
-        //     recording_info: {
-        //         enabled: true
-        //     }
-        // })
-        //     .then((res) => {
-        //         console.log("new room resp is ", res)
-        //     })
-        //     .catch((err) => {
-        //         console.log(err)
-        //     })
-        // }
-        // createRoom()
-
-        if (!router.query?.roomId || !localPeer) {
+        if (!localPeer) {
             setModal(true)
-        } else {
-            // let token;
-            // axios.post(`https://prod-in2.100ms.live/hmsapi/testsubspace.app.100ms.live/api/token`, {
-            //     user_id: "1234",
-            //     role: router.query["role"],
-            //     room_id: roomId[router.query["type"]],
-
-            // })
-            //     .then((res) => {
-            //         console.log(res);
-            //         // const { token } = {...res};
-            //         // console.log(token)
-            //         token = res?.data?.token
-            //         hmsActions.join({
-            //             userName: router.query["name"] || "Darshan V",
-            //             // authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwicm9vbV9pZCI6IjYzZDBmYzFmZGE3ZTdjYTgxMjg0MGE5OSIsInVzZXJfaWQiOiIxMjM0Iiwicm9sZSI6Imhvc3QiLCJqdGkiOiJkNDk3YjdhNS04NTFlLTQwZjktYjRmOC0zNzA4MTJmYzUwMWIiLCJ0eXBlIjoiYXBwIiwidmVyc2lvbiI6MiwiZXhwIjoxNjc0NzM1MzA0fQ.EWSPwSaJzMXYXe826u_0ODKD_8e2aHsEj7kEQHMC_8s",
-            //             authToken: token,
-            //             settings: {
-            //                 isAudioMuted: true,
-            //             },
-            //         });
-            //     })
-
         }
-
-        // curl --location --request POST 'https://prod-in2.100ms.live/hmsapi/testsubspace.app.100ms.live/api/token' \
-        // --header 'Content-Type: application/json' \
-        // --data-raw '{
-        //     "room_id":"63d0fc1fda7e7ca812840a99",
-        //     "role":"host",
-        //     "user_id":"1234"
-        // }'
-
-        setModal(true)
-    }, []);
+    }, [localPeer]);
 
     useEffect(() => {
         if (visible === true) {
@@ -255,78 +205,33 @@ function Test() {
         isVisible(dat)
     }
 
-    console.log(peers)
+    // console.log(peers)
     // console.log(stage)
 
     const createRoom = async () => {
         console.log(user)
-        // axios.post("https://dvconf.app.100ms.live/v2/rooms", {
-        //     name: user.roomName,
-        //     description: "This is a sample description for the room",
-        //     recording_info: {
-        //         enabled: true
-        //     }
-        // })
-        //     .then((res) => {
-        //         console.log("new room resp is ", res)
-        //     })
-        //     .catch((err) => {
-        //         console.log(err)
-        //     })
-
-        // const app_access_key = '63d0fbde9957be8a5b8c2021';
-        // const app_secret = '3HWPQKsBSNyZ9ICTlYCqbaOV_-xgSNhRI7B1jHW5kdronpBi4J--L-18oSAlfU-IrljWHs0WHWMXLTb1hdIHTreCA_gtT7fEwKcvmqQ9pLmGCcV6O3tQoBuZ_UegBjTK_FhercYND1z4NkWa358p9kzCjMmxMTPJaS7Df4WMsO0=';
-        // const payload = {
-        //     access_key: app_access_key,
-        //     type: 'management',
-        //     version: 2,
-        //     iat: Math.floor(Date.now() / 1000),
-        //     nbf: Math.floor(Date.now() / 1000)
-        // };
-
-        // const secret = new TextEncoder().encode(
-        //     app_secret
-        // )
-        // const alg = 'HS256'
-
-        // const jwt = await new jose.SignJWT(payload)
-        //     .setProtectedHeader({ alg })
-        //     .setIssuedAt()
-        //     .setExpirationTime('24h')
-        //     .sign(secret)
-
-        // console.log(jwt)
-
-        var app_access_key = '63d0fbde9957be8a5b8c2021';
-        var app_secret = '3HWPQKsBSNyZ9ICTlYCqbaOV_-xgSNhRI7B1jHW5kdronpBi4J--L-18oSAlfU-IrljWHs0WHWMXLTb1hdIHTreCA_gtT7fEwKcvmqQ9pLmGCcV6O3tQoBuZ_UegBjTK_FhercYND1z4NkWa358p9kzCjMmxMTPJaS7Df4WMsO0=';
-        var jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwidHlwZSI6Im1hbmFnZW1lbnQiLCJ2ZXJzaW9uIjoyLCJpYXQiOjE2Nzc3OTAyMTcsIm5iZiI6MTY3Nzc5MDIxNywiZXhwIjoxNjg1NTY2MjE3LCJqdGkiOiJjYmY0ODg2OS04NWY0LTRlNmQtYTkxNC0zOTRjMjJkNDQ0YWMifQ.EdcCJxKsTLogDptnAqpjB3wPvdHB3hriWqpJH3890FA'
         const config = {
             headers: { 'Authorization': `Bearer ${jwt}`, 'Content-Type': 'application/json' },
         };
 
-        await axios.post("https://api.100ms.live/v2/rooms", {
-            name: user.roomName,
-            description: "This is a sample description for the room",
-            recording_info: {
-                enabled: true
-            }
-        }, config)
-            .then((res) => {
-                console.log("new room resp is ", res.data)
-                setRoom(res?.data)
-
+        if (invited.status) {
+            axios.get(`https://api.100ms.live/v2/rooms/${invited?.roomId}`,
+                config
+            ).then((res) => {
                 let token;
+                console.log(res)
                 axios.post(`https://prod-in2.100ms.live/hmsapi/dvconf.app.100ms.live/api/token`, {
-                    user_id: res?.data?.customer,
+                    user_id: uuid4(),
                     role: "host",
-                    room_id: res?.data?.id,
-
+                    room_id: invited?.roomId,
                 })
                     .then((res) => {
                         console.log(res);
                         // const { token } = {...res};
                         // console.log(token)
                         token = res?.data?.token
+                        setModal(false)
+                        toast.success("Room Joined successfully")
                         hmsActions.join({
                             userName: user?.userName,
                             // authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwicm9vbV9pZCI6IjYzZDBmYzFmZGE3ZTdjYTgxMjg0MGE5OSIsInVzZXJfaWQiOiIxMjM0Iiwicm9sZSI6Imhvc3QiLCJqdGkiOiJkNDk3YjdhNS04NTFlLTQwZjktYjRmOC0zNzA4MTJmYzUwMWIiLCJ0eXBlIjoiYXBwIiwidmVyc2lvbiI6MiwiZXhwIjoxNjc0NzM1MzA0fQ.EWSPwSaJzMXYXe826u_0ODKD_8e2aHsEj7kEQHMC_8s",
@@ -335,13 +240,53 @@ function Test() {
                                 isAudioMuted: true,
                             },
                         });
-                        setModal(false)
+                    })
+                    .catch((err) => {
+                        console.log(err)
                     })
             })
-            .catch((err) => {
-                console.log(err)
-            })
+                .catch((err) => {
+                    console.log(err)
+                    toast.error("Invalid roomId")
+                })
+        } else {
+            await axios.post("https://api.100ms.live/v2/rooms", {
+                name: user.roomName,
+                description: "This is a sample description for the room",
+                template_id: "64003f34862ddd899e776cf7"
+            }, config)
+                .then((res) => {
+                    console.log("new room resp is ", res.data)
+                    setRoom(res?.data)
 
+                    let token;
+                    axios.post(`https://prod-in2.100ms.live/hmsapi/dvconf.app.100ms.live/api/token`, {
+                        user_id: res?.data?.customer,
+                        role: "host",
+                        room_id: res?.data?.id,
+
+                    })
+                        .then((res) => {
+                            console.log(res);
+                            // const { token } = {...res};
+                            // console.log(token)
+                            token = res?.data?.token
+                            toast.success("Room created successfully, Invite peers by copying the link")
+                            hmsActions.join({
+                                userName: user?.userName,
+                                // authToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhY2Nlc3Nfa2V5IjoiNjNkMGZiZGU5OTU3YmU4YTViOGMyMDIxIiwicm9vbV9pZCI6IjYzZDBmYzFmZGE3ZTdjYTgxMjg0MGE5OSIsInVzZXJfaWQiOiIxMjM0Iiwicm9sZSI6Imhvc3QiLCJqdGkiOiJkNDk3YjdhNS04NTFlLTQwZjktYjRmOC0zNzA4MTJmYzUwMWIiLCJ0eXBlIjoiYXBwIiwidmVyc2lvbiI6MiwiZXhwIjoxNjc0NzM1MzA0fQ.EWSPwSaJzMXYXe826u_0ODKD_8e2aHsEj7kEQHMC_8s",
+                                authToken: token,
+                                settings: {
+                                    isAudioMuted: true,
+                                },
+                            });
+                            setModal(false)
+                        })
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
     }
     return (
         <div className="max-h-screen justify-center ">
@@ -379,11 +324,11 @@ function Test() {
                                             {peers &&
                                                 getCurrentVideoCards()
                                                     // .filter((peer) => !peer.isLocal)
-                                                    .map((peer) => {
+                                                    .map((peer, index) => {
                                                         return (
                                                             <>
-                                                                <div className="relative">
-                                                                   <VideoSpaces isLocal={false} peer={peer} setPinned={setPinned} pinned={pinned} />
+                                                                <div className="relative" key={index}>
+                                                                    <VideoSpaces isLocal={false} peer={peer} setPinned={setPinned} pinned={pinned} />
                                                                 </div>
 
                                                             </>
@@ -455,21 +400,38 @@ function Test() {
                     showClose={false}
                 >
                     <div className="w-[400px] p-4">
-                        <div class="mb-6">
-                            <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900 ">Your name</label>
-                            <input type="text" id="default-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        <div className="mb-6">
+                            <label for="default-input" className="block mb-2 text-sm font-medium text-gray-900 ">Your name</label>
+                            <input type="text" id="default-input" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 value={user?.userName}
                                 onChange={(e) => setUser((prev) => ({ ...prev, userName: e.target.value }))}
                             />
                         </div>
-                        <div class="mb-6">
-                            <label for="default-input" class="block mb-2 text-sm font-medium text-gray-900 ">Room name</label>
-                            <input type="text" id="default-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                value={user?.roomName}
-                                onChange={(e) => setUser((prev) => ({ ...prev, roomName: e.target.value }))}
-                            />
+                        <div className="flex justify-center">
+                            <input type="checkbox" id="cb" className="my-auto cursor-pointer" defaultChecked={invited?.status} onChange={() => setInvited((prev) => ({ ...prev, status: !invited?.status }))} />
+                            <label for="default-input" htmlFor="cb" className="block mb-2 text-sm font-medium text-gray-900 mt-2 ml-4">I have room ID</label>
                         </div>
-                        <button onClick={() => createRoom()} type="submit" class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create room</button>
+                        {
+                            invited?.status ? (
+                                <div className="mb-6">
+                                    <label for="default-input" className="block mb-2 text-sm font-medium text-gray-900 ">Room Id</label>
+                                    <input type="text" id="default-input" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={invited?.roomId}
+                                        onChange={(e) => setInvited((prev) => ({ ...prev, roomId: e.target.value }))}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="mb-6">
+                                    <label for="default-input" className="block mb-2 text-sm font-medium text-gray-900 ">Room name</label>
+                                    <input type="text" id="default-input" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={user?.roomName}
+                                        onChange={(e) => setUser((prev) => ({ ...prev, roomName: e.target.value }))}
+                                    />
+                                </div>
+                            )
+                        }
+
+                        <button onClick={() => createRoom()} type="submit" class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{invited?.status ? "Join room" : "Create room"}</button>
                     </div>
                 </Modal>
             )}
