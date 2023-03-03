@@ -76,7 +76,7 @@ function VideoSpaces({ peer, islocal, pinned, setPinned }) {
            ${pinned?.status ? "h-full w-full" : "h-[250px]"}
            ${islocal ? "mirror" : ""}
           `}
-          // ${peer?.id === dominantSpeaker?.id ? "drop-shadow-xl border-4 border-sky-300 transition-all ease-in-out" : ""}
+        // ${peer?.id === dominantSpeaker?.id ? "drop-shadow-xl border-4 border-sky-300 transition-all ease-in-out" : ""}
 
         ></video>) : (
 
@@ -86,7 +86,9 @@ function VideoSpaces({ peer, islocal, pinned, setPinned }) {
         )}
 
         <div className=" text-white font-medium justify-center text-lg flex uppercase text-center mt-2">
-          {(localPeer?.id !== peer?.id) ? <h3>You</h3> : <h3>{peer.name}</h3>}
+          {(localPeer?.id === peer?.id) ? <h3>You</h3> :
+            <h3>{peer.name}</h3>
+          }
           <span className="m-2 my-auto text-yellow-400">{metaData?.isHandRaised && <HiOutlineHand />}</span>
         </div>
 
